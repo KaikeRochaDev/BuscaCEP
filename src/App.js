@@ -7,6 +7,7 @@ import api from './services/api'
 function App() {
 
   const [input, setInput] = useState('')
+  const [cep, setCep] = useState({})
 
   async function handleSearch(){
     if(input === ''){
@@ -16,13 +17,22 @@ function App() {
 
     try{
       const response = await api.get(`${input}/json/`)
-      console.log(response.data)
-      
+      setCep(response.data)
+      setInput('')
+
     } catch{
       alert('Ops, erro ao buscar!')
       setInput('')
     }
   }
+
+  document.addEventListener('keypress', function(e){
+    if(e.key === 'Enter'){
+      const btn = document.getElementById('btnSearch')
+
+      btn.click()
+    }
+  })
 
   return (
     <div className="container">
@@ -31,30 +41,28 @@ function App() {
       <div className="containerInput">
         <input type="text" placeholder="Digite seu CEP..." value={input} onChange={(e) => setInput(e.target.value)}/>
 
-        <button className="buttonSearch" onClick={handleSearch}>
+        <button id='btnSearch' className="buttonSearch" onClick={handleSearch}>
           <FiSearch size={25} color='#fff'/>
         </button>
       </div>
 
-      <main className='main'>
-        <h2>CEP: 709022422</h2>
+      {Object.keys(cep).length > 0 && (
+          <main className='main'>
+              <h2>CEP: {cep.cep}</h2>
 
-        <span>
-          Rua Teste
-        </span>
+              <span>
+                {cep.logradouro}
+              </span>
 
-        <span>
-          Complemento: Algum
-        </span>
-
-        <span>
-          Bairro
-        </span>
-
-        <span>
-          Seropédica - RJ
-        </span>
-      </main>
+              <span>
+                {cep.bairro}
+              </span>
+      
+              <span>
+                {cep.localidade} - {cep.uf}
+              </span>
+          </main>
+      )}
     </div>
   );
 }
